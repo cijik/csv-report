@@ -8,6 +8,9 @@ import com.opencsv.CSVWriter;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.sun.deploy.ref.Helpers;
+import etm.core.configuration.EtmManager;
+import etm.core.monitor.EtmMonitor;
+import etm.core.monitor.EtmPoint;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -23,11 +26,15 @@ public class CsvWriter {
     private CsvMapper mapper;
     private CsvSchema schema;
 
+    private static final EtmMonitor etmMonitor = EtmManager.getEtmMonitor();
+
     public CsvWriter() {
         mapper = new CsvMapper();
     }
 
     public void writeCsvJackson(Class clazz, List<Report> report) throws IOException {
+        EtmPoint point = etmMonitor.createPoint("CsvWriter:writeCsvJackson");
+
         schema = mapper.schemaFor(clazz).withHeader();
         ObjectWriter myObjectWriter = mapper.writer(schema);
         File tempFile = new File("payment.csv");
@@ -35,15 +42,22 @@ public class CsvWriter {
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(tempFileOutputStream, 1024);
         OutputStreamWriter writerOutputStream = new OutputStreamWriter(bufferedOutputStream, StandardCharsets.UTF_8);
         myObjectWriter.writeValue(writerOutputStream, report);
+
+        point.collect();
     }
 
     public void writeCsvOpen(ResultSet report, Path path) throws Exception {
+        EtmPoint point = etmMonitor.createPoint("CsvWriter:writeCsvOpen");
+
         CSVWriter writer = new CSVWriter(new FileWriter(path.toString()));
         writer.writeAll(report, true);
         writer.close();
+
+        point.collect();
     }
 
     public void writeCsvOpenBean(CsvCreator creator, Path path) throws Exception {
+        EtmPoint point = etmMonitor.createPoint("CsvWriter:writeCsvOpenBean");
 
         Writer writer = new FileWriter(path.toString());
 
@@ -55,5 +69,6 @@ public class CsvWriter {
 
         sbc.write(list);
         writer.close();
+        point.collect();
     }
 }
