@@ -1,7 +1,7 @@
 package com.endava.csvreport;
 
-import com.endava.csvreport.csv.CsvCreator;
 import com.endava.csvreport.csv.CsvWriter;
+import com.endava.csvreport.csv.ReportCsvCreator;
 import com.endava.csvreport.database.ConnectionHandler;
 import com.endava.csvreport.pojo.Report;
 import etm.core.configuration.BasicEtmConfigurator;
@@ -12,7 +12,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.DriverManager;
 
@@ -26,34 +25,30 @@ public class CsvReportApplication {
 
         CsvWriter writer = new CsvWriter();
         ConnectionHandler handler = new ConnectionHandler(DriverManager.getConnection(address, "postgres", "postgres"));
-        CsvCreator creator = new CsvCreator(handler);
-
-        Path path = Paths.get("openCsvReport.csv");
-        Path pathBean = Paths.get("openCsvBeanReport.csv");
+        ReportCsvCreator creator = new ReportCsvCreator(handler);
 
         BasicEtmConfigurator.configure();
         EtmMonitor monitor = EtmManager.getEtmMonitor();
         monitor.start();
 
         for (int i = 0; i < 100; i++) {
-            writer.writeCsvJackson(Report.class, creator.getAll());
+            writer.writeCsvJackson(Report.class, creator.getReportList());
             Files.delete(Paths.get("payment.csv"));
         }
 
         for (int i = 0; i < 100; i++) {
-            if (!Files.exists(path)) {
-                Files.createFile(path);
-            }
-            writer.writeCsvOpen(creator.getResultSet(), path);
-            Files.delete(path);
+            writer.writeCsvOpen(creator.getReportResultSet(), Paths.get("paymentOpen.csv"));
+            Files.delete(Paths.get("paymentOpen.csv"));
         }
 
         for (int i = 0; i < 100; i++) {
-            if (!Files.exists(pathBean)) {
-                Files.createFile(pathBean);
-            }
-            writer.writeCsvOpenBean(creator, pathBean);
-            Files.delete(pathBean);
+            writer.writeCsvOpenBean(creator, Paths.get("paymentOpenBean.csv"));
+            Files.delete(Paths.get("paymentOpenBean.csv"));
+        }
+
+        for (int i = 0; i < 100; i++) {
+            writer.writeCsvUnivocity(creator.getReportList());
+            Files.delete(Paths.get("paymentUni.csv"));
         }
 
         monitor.render(new SimpleTextRenderer());
