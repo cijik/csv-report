@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Getter
 @Setter
-@JsonPropertyOrder(value = {"paymentId","customerId","staffId","rentalId","amount","paymentDate"})
+@JsonPropertyOrder(value = {"paymentId","staffId","customerId"})
 public class Report implements Serializable {
 
     @Parsed(index = 0)
