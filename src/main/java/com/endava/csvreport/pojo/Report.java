@@ -1,46 +1,29 @@
 package com.endava.csvreport.pojo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.univocity.parsers.annotations.Parsed;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Date;
 
+@Getter
 @Setter
 @JsonPropertyOrder(value = {"paymentId","customerId","staffId","rentalId","amount","paymentDate"})
 public class Report implements Serializable {
 
-    private int paymentId;
-    private int customerId;
-    private int staffId;
-    private int rentalId;
-    private int amount;
+    @Parsed(index = 0)
+    private Integer paymentId;
+    @Parsed(index = 1)
+    private Integer customerId;
+    @Parsed(index = 2)
+    private Integer staffId;
+    @Parsed(index = 3)
+    private Integer rentalId;
+    @Parsed(index = 4)
+    private Integer amount;
+    @Parsed(index = 5)
     private Date paymentDate;
 
-    public int getPaymentId() {
-        return paymentId;
-    }
-
-    public int getCustomerId() {
-        return customerId;
-    }
-
-    public int getStaffId() {
-        return staffId;
-    }
-
-    public int getRentalId() {
-        return rentalId;
-    }
-
-    public int getAmount() {
-        return amount;
-    }
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    public Date getPaymentDate(){
-        return paymentDate;
-    }
 }

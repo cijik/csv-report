@@ -8,22 +8,22 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CsvCreator {
+public class ReportCsvCreator {
 
     private ConnectionHandler connectionHandler;
 
-    public CsvCreator(ConnectionHandler connectionHandler) {
+    public ReportCsvCreator(ConnectionHandler connectionHandler) {
         this.connectionHandler = connectionHandler;
     }
 
-    public ResultSet getResultSet() {
+    public ResultSet getReportResultSet() {
         String request = "SELECT * FROM payment";
         return connectionHandler.get(request);
     }
 
-    public List<Report> getAll() throws SQLException {
+    public List<Report> getReportList() throws SQLException {
         List<Report> reportList = new ArrayList<>();
-        ResultSet rs = getResultSet();
+        ResultSet rs = getReportResultSet();
         while (rs.next()) {
             Report report = new Report();
             report.setPaymentId(rs.getInt(1));
@@ -34,6 +34,6 @@ public class CsvCreator {
             report.setPaymentDate(rs.getDate(6));
             reportList.add(report);
         }
-        return reportList;
+        return new ArrayList<>(reportList);
     }
 }
